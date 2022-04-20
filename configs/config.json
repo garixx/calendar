@@ -1,0 +1,10 @@
+{
+  "server": {
+    "address": ":8087"
+  },
+  "database": {
+    "user": "user",
+    "pass": "password",
+    "name": "test"
+  }
+}
