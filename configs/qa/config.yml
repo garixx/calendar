@@ -1,0 +1,3 @@
+frontend: flagparser
+server:
+  address: 8087

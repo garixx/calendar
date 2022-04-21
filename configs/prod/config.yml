@@ -1,0 +1,3 @@
+frontend: cli
+server:
+  address: 8087
