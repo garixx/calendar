@@ -16,14 +16,13 @@ type restFrontEnd struct{}
 
 func (f restFrontEnd) Start(ctx context.Context) error {
 	log.Println("it's me, rest frontend")
-
 	r := mux.NewRouter()
 	r.HandleFunc("/register", handlers.RegistrationHandler).Methods("POST")
 	srv := &http.Server{
-		Addr:         "0.0.0.0:" + viper.GetString("server.address"),
-		WriteTimeout: time.Second * 15,
-		ReadTimeout:  time.Second * 15,
-		IdleTimeout:  time.Second * 60,
+		Addr:         viper.GetString("server.address") + ":" + viper.GetString("server.port"),
+		WriteTimeout: time.Second * viper.GetDuration("server.timeout.write"),
+		ReadTimeout:  time.Second * viper.GetDuration("server.timeout.read"),
+		IdleTimeout:  time.Second * viper.GetDuration("server.timeout.idle"),
 		Handler:      r,
 	}
 
