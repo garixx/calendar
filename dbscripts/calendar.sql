@@ -1,5 +1,5 @@
-DROP DATABASE IF EXISTS calendar;
-CREATE DATABASE calendar;
+-- DROP DATABASE IF EXISTS calendar;
+-- CREATE DATABASE calendar;
 
 DROP TABLE IF EXISTS users;
 CREATE TABLE users
@@ -54,8 +54,8 @@ DROP TABLE IF EXISTS event_guests;
 CREATE TABLE event_guests
 (
     id        serial                                       NOT NULL UNIQUE,
-    eventId   int references events (id) ON DELETE CASCADE NOT NULL,
-    guestId   int references guests (id) ON DELETE CASCADE NOT NULL,
+    eventId   UUID references events (id) ON DELETE CASCADE NOT NULL,
+    guestId   UUID references guests (id) ON DELETE CASCADE NOT NULL,
     isDeleted bool DEFAULT false
 );
 
@@ -63,7 +63,7 @@ DROP TABLE IF EXISTS companies_guests;
 CREATE TABLE companies_guests
 (
     id        serial                                          NOT NULL UNIQUE,
-    companyId int references companies (id) ON DELETE CASCADE NOT NULL,
-    guestId   int references guests (id) ON DELETE CASCADE    NOT NULL,
+    companyId UUID references companies (id) ON DELETE CASCADE NOT NULL,
+    guestId   UUID references guests (id) ON DELETE CASCADE    NOT NULL,
     isDeleted bool DEFAULT false
 );
