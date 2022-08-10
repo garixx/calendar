@@ -1,6 +1,3 @@
-#BINARY=engine
-#engine:
-#	go build -o ${BINARY} cmd/*.go
 test:
 	go test ./...
 
