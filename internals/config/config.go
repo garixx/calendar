@@ -8,13 +8,12 @@ import (
 )
 
 type PostgresConfig struct {
-	Host        string
-	Port        string
-	Username    string
-	Password    string
-	DBName      string
-	SSLMode     string
-	MaxAttempts int
+	Host     string
+	Port     string
+	Username string
+	Password string
+	DBName   string
+	SSLMode  string
 }
 
 func GetPostgresConfig(path string) (PostgresConfig, error) {
@@ -23,22 +22,21 @@ func GetPostgresConfig(path string) (PostgresConfig, error) {
 		return PostgresConfig{}, err
 	}
 	return PostgresConfig{
-		Host:        viper.GetString("database.postgres.host"),
-		Port:        viper.GetString("database.postgres.port"),
-		Username:    viper.GetString("database.postgres.user"),
-		Password:    os.Getenv("POSTGRES_PASSWORD"),
-		DBName:      viper.GetString("database.postgres.dbname"),
-		SSLMode:     viper.GetString("database.postgres.sslmode"),
-		MaxAttempts: viper.GetInt("database.postgres.max.attempts"),
+		Host:     viper.GetString("database.postgres.host"),
+		Port:     viper.GetString("database.postgres.port"),
+		Username: viper.GetString("database.postgres.user"),
+		Password: os.Getenv("POSTGRES_PASSWORD"),
+		DBName:   viper.GetString("database.postgres.dbname"),
+		SSLMode:  viper.GetString("database.postgres.sslmode"),
 	}, nil
 }
 
 func initConfig(path string) error {
-	// make qa environment default
-	_ = viper.BindEnv("environment")
-	viper.SetDefault("environment", "QA")
+	//// make qa environment default
+	//_ = viper.BindEnv("environment")
+	//viper.SetDefault("environment", "QA")
 
-	path = fmt.Sprintf(path, strings.ToLower(viper.GetString("environment")))
+	path = fmt.Sprintf(path, strings.ToLower(os.Getenv("environment")))
 	viper.SetConfigFile(path)
 	return viper.ReadInConfig()
 }

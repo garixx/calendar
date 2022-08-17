@@ -31,6 +31,7 @@ func (p *PostgresUserRepository) CreateUser(user models.User) (models.User, erro
 	}
 	return newUser, nil
 }
+
 func (p *PostgresUserRepository) GetUser(user models.User) (models.User, error) {
 	var users []*models.User
 	err := pgxscan.Select(context.Background(), p.client, &users, "select * from users where login = $1 and password_hash = $2", user.Login, user.PasswordHash)

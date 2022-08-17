@@ -69,4 +69,4 @@ CREATE TABLE companies_guests
 );
 
 -- bootstrap
-INSERT INTO users (login, password_hash) VALUES ('me', 'hashHere');
+INSERT INTO users (login, password_hash) VALUES ('user', '$2a$14$1MEzFbcJXlcBQ8/26tTwK.yF7A2k3TcjWhetZ3CZlvNxUz5LX/NwG');

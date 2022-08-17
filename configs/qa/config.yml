@@ -12,5 +12,3 @@ database:
     port: 5432
     user: postgres
     sslmode: disable
-    max:
-      attempts: 5
