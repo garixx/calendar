@@ -11,7 +11,7 @@ import (
 
 func registerHandler(useCases *aggregate.Calendar) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var payload models.SignUpPayload
+		var payload models.UserRequest
 
 		err := json.NewDecoder(r.Body).Decode(&payload)
 		if err != nil || validate.Struct(payload) != nil {
@@ -25,7 +25,7 @@ func registerHandler(useCases *aggregate.Calendar) func(w http.ResponseWriter, r
 			return
 		}
 
-		response := models.SignUpResponse{
+		response := models.UserResponse{
 			Id:        user.Id,
 			Login:     user.Login,
 			CreatedAt: user.CreatedAt.Format(time.RFC3339),

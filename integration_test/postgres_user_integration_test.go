@@ -81,7 +81,7 @@ func TestCreateUserCase(t *testing.T) {
 	password := "Test"
 	createdAt := time.Now()
 
-	payload := models.SignUpPayload{
+	payload := models.UserRequest{
 		Login:    login,
 		Password: password,
 	}

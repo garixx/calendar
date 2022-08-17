@@ -15,7 +15,7 @@ func NewUserUsecase(repo models.UserRepository) models.UserUsecase {
 	}
 }
 
-func (u *UserUsecase) CreateUser(payload models.SignUpPayload) (models.User, error) {
+func (u *UserUsecase) CreateUser(payload models.UserRequest) (models.User, error) {
 	hash, err := hashing.HashPassword(payload.Password)
 	if err != nil {
 		return models.User{}, err

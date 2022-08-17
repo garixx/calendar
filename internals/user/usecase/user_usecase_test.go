@@ -23,7 +23,7 @@ func TestUserUsecase_CreateUser(t *testing.T) {
 	hash := "passHash"
 	createdAt := time.Now()
 
-	payload := models.SignUpPayload{
+	payload := models.UserRequest{
 		Login:    login,
 		Password: password,
 	}

@@ -4,12 +4,12 @@ import (
 	"time"
 )
 
-type SignUpPayload struct {
+type UserRequest struct {
 	Login    string `json:"login"    validate:"required,alphanum,tenMax"`
 	Password string `json:"password" validate:"required,alphanum,twentyMax"`
 }
 
-type SignUpResponse struct {
+type UserResponse struct {
 	Id        string `json:"id"        validate:"required,uuid4"`
 	Login     string `json:"login"     validate:"required,alphanum,tenMax"`
 	CreatedAt string `json:"createdAt" validate:"required"`
@@ -26,7 +26,7 @@ type User struct {
 
 //go:generate mockgen -package mocks -destination ../mocks/user_usecase_mock.go . UserUsecase
 type UserUsecase interface {
-	CreateUser(payload SignUpPayload) (User, error)
+	CreateUser(payload UserRequest) (User, error)
 	GetUser(user User) (User, error)
 }
 

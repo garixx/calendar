@@ -27,7 +27,7 @@ func TestRegisterHandler(t *testing.T) {
 	hash := "passHash"
 	createdAt := time.Now()
 
-	payload := models.SignUpPayload{
+	payload := models.UserRequest{
 		Login:    login,
 		Password: password,
 	}
@@ -57,7 +57,7 @@ func TestRegisterHandler(t *testing.T) {
 
 	resp := w.Result()
 
-	var response models.SignUpResponse
+	var response models.UserResponse
 	err = json.NewDecoder(resp.Body).Decode(&response)
 
 	assert.NoError(t, err)

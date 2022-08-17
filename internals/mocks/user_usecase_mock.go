@@ -35,7 +35,7 @@ func (m *MockUserUsecase) EXPECT() *MockUserUsecaseMockRecorder {
 }
 
 // CreateUser mocks base method.
-func (m *MockUserUsecase) CreateUser(arg0 models.SignUpPayload) (models.User, error) {
+func (m *MockUserUsecase) CreateUser(arg0 models.UserRequest) (models.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", arg0)
 	ret0, _ := ret[0].(models.User)
