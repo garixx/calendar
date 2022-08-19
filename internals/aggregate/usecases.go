@@ -6,12 +6,13 @@ import (
 )
 
 type Calendar struct {
-	Logger   log.Logger
-	UserCase models.UserUsecase
+	Logger    log.Logger
+	UserCase  models.UserUsecase
+	TokenCase models.TokenUsecase
 }
 
-func NewCalendar(userCase models.UserUsecase) Calendar {
-	return Calendar{
-		UserCase: userCase,
-	}
-}
+//func NewCalendar(userCase models.UserUsecase) Calendar {
+//	return Calendar{
+//		UserCase: userCase,
+//	}
+//}

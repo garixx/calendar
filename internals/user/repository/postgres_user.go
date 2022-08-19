@@ -5,6 +5,7 @@ import (
 	"calendar/internals/models"
 	"context"
 	"github.com/georgysavva/scany/pgxscan"
+	"github.com/jackc/pgx/v4"
 )
 
 type PostgresUserRepository struct {
@@ -32,11 +33,14 @@ func (p *PostgresUserRepository) CreateUser(user models.User) (models.User, erro
 	return newUser, nil
 }
 
-func (p *PostgresUserRepository) GetUser(user models.User) (models.User, error) {
+func (p *PostgresUserRepository) GetUserByLogin(login string) (models.User, error) {
 	var users []*models.User
-	err := pgxscan.Select(context.Background(), p.client, &users, "select * from users where login = $1 and password_hash = $2", user.Login, user.PasswordHash)
+	err := pgxscan.Select(context.Background(), p.client, &users, "select * from users where login = $1 ", login)
 	if err != nil {
 		return models.User{}, err
+	}
+	if len(users) < 1 {
+		return models.User{}, pgx.ErrNoRows
 	}
 
 	return *users[0], nil

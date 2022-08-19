@@ -27,6 +27,6 @@ func (u *UserUsecase) CreateUser(payload models.UserRequest) (models.User, error
 	return u.userRepo.CreateUser(user)
 }
 
-func (u *UserUsecase) GetUser(user models.User) (models.User, error) {
-	return u.userRepo.GetUser(user)
+func (u *UserUsecase) GetUserByLogin(login string) (models.User, error) {
+	return u.userRepo.GetUserByLogin(login)
 }

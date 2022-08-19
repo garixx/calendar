@@ -16,7 +16,6 @@ type UserResponse struct {
 }
 
 type User struct {
-	//Id           uuid.UUID `json:"id"        db:"id"`
 	Id           string    `json:"id"        db:"id"            validate:"required,uuid4"`
 	Login        string    `json:"login"     db:"login"         validate:"required,alphanum,tenMax"`
 	PasswordHash string    `json:"~"         db:"password_hash" validate:"required"`
@@ -24,14 +23,16 @@ type User struct {
 	IsDeleted    bool      `json:"isDeleted" db:"is_deleted"`
 }
 
+//mockery --name=MockUserUsecase --with-expecter
 //go:generate mockgen -package mocks -destination ../mocks/user_usecase_mock.go . UserUsecase
 type UserUsecase interface {
 	CreateUser(payload UserRequest) (User, error)
-	GetUser(user User) (User, error)
+	GetUserByLogin(login string) (User, error)
 }
 
+//mockery --name=MockUserRepository --with-expecter
 //go:generate mockgen -package mocks -destination ../mocks/user_repository_mock.go . UserRepository
 type UserRepository interface {
 	CreateUser(user User) (User, error)
-	GetUser(user User) (User, error)
+	GetUserByLogin(login string) (User, error)
 }

@@ -3,23 +3,28 @@ package http
 import (
 	"calendar/internals/aggregate"
 	"calendar/internals/models"
-	"calendar/pkg/validate"
+	"calendar/internals/validate"
 	"encoding/json"
 	"net/http"
 	"time"
 )
 
-func registerHandler(useCases *aggregate.Calendar) func(w http.ResponseWriter, r *http.Request) {
+func registerHandler(calendar *aggregate.Calendar) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var payload models.UserRequest
 
 		err := json.NewDecoder(r.Body).Decode(&payload)
-		if err != nil || validate.Struct(payload) != nil {
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		user, err := useCases.UserCase.CreateUser(payload)
+		if err := validate.Struct(payload); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		user, err := calendar.UserCase.CreateUser(payload)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return

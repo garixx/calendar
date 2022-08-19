@@ -2,16 +2,19 @@ package repository
 
 import (
 	"calendar/internals/models"
-	"calendar/pkg/validate"
+	"calendar/internals/validate"
+	"testing"
+	"time"
+
+	"github.com/jackc/pgx/v4"
+
 	"github.com/chrisyxlee/pgxpoolmock"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"testing"
-	"time"
 )
 
-func TestCreateUser(t *testing.T) {
+func TestPostgresUserRepository_CreateUser(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -50,7 +53,7 @@ func TestCreateUser(t *testing.T) {
 	assert.Equal(t, created, res)
 }
 
-func TestGetUser(t *testing.T) {
+func TestPostgresUserRepository_GetUserByLogin1(t *testing.T) {
 	t.Parallel()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -66,14 +69,10 @@ func TestGetUser(t *testing.T) {
 	pgxRows := pgxpoolmock.NewRows(columns).AddRow(userUUID, login, passwordHash, createdAt, false).ToPgxRows()
 
 	mockPool.EXPECT().
-		Query(gomock.Any(), gomock.Any(), gomock.Eq(login), gomock.Eq(passwordHash)).
+		Query(gomock.Any(), gomock.Any(), gomock.Eq(login)).
 		Return(pgxRows, nil)
 
 	repo := NewPostgresUserRepository(mockPool)
-	user := models.User{
-		Login:        login,
-		PasswordHash: passwordHash,
-	}
 
 	expected := models.User{
 		Id:           userUUID,
@@ -83,7 +82,7 @@ func TestGetUser(t *testing.T) {
 		IsDeleted:    false,
 	}
 
-	res, err := repo.GetUser(user)
+	res, err := repo.GetUserByLogin(login)
 
 	// then
 	assert.NotNil(t, res)
@@ -91,40 +90,102 @@ func TestGetUser(t *testing.T) {
 	assert.Equal(t, expected, res)
 }
 
-//func TestUserRepositoryMock(t *testing.T) {
-//	t.Parallel()
-//	ctrl := gomock.NewController(t)
-//	defer ctrl.Finish()
-//
-//	// given
-//	userUUID := uuid.NewString()
-//	login := "myLogin"
-//	passwordHash := "passHash"
-//	createdAt := time.Now()
-//
-//	user := models.User{
-//		Login:        login,
-//		PasswordHash: passwordHash,
+func TestPostgresUserRepository_GetUserByLogin2(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	// given
+	//userUUID := uuid.NewString()
+	login := "me"
+	//passwordHash := "hashHere"
+	//createdAt := time.Now()
+	//
+	mockPool := pgxpoolmock.NewMockPgxIface(ctrl)
+	//columns := []string{"id", "login", "password_hash", "created_at", "is_deleted"}
+	//pgxRows := pgxpoolmock.NewRows(columns).AddRow(userUUID, login, passwordHash, createdAt, false).ToPgxRows()
+
+	mockPool.EXPECT().Query(gomock.Any(), gomock.Any(), gomock.Eq(login)).Return(nil, pgx.ErrNoRows)
+
+	repo := NewPostgresUserRepository(mockPool)
+
+	//expected := models.User{
+	//	Id:           userUUID,
+	//	Login:        login,
+	//	PasswordHash: passwordHash,
+	//	CreatedAt:    createdAt,
+	//	IsDeleted:    false,
+	//}
+
+	_, err := repo.GetUserByLogin(login)
+	assert.Error(t, err)
+	// then
+	//assert.NotNil(t, res)
+	//assert.NoError(t, err)
+	//assert.Equal(t, expected, res)
+}
+
+func TestPostgresUserRepository_GetUserByLogin3(t *testing.T) {
+	t.Parallel()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	// given
+	//userUUID := uuid.NewString()
+	login := "me"
+	//passwordHash := "hashHere"
+	//createdAt := time.Now()
+	//
+	mockPool := pgxpoolmock.NewMockPgxIface(ctrl)
+	columns := []string{"id", "login", "password_hash", "created_at", "is_deleted"}
+	pgxRows := pgxpoolmock.NewRows(columns).ToPgxRows()
+
+	mockPool.EXPECT().Query(gomock.Any(), gomock.Any(), gomock.Eq(login)).Return(pgxRows, nil)
+
+	repo := NewPostgresUserRepository(mockPool)
+
+	//expected := models.User{
+	//	Id:           userUUID,
+	//	Login:        login,
+	//	PasswordHash: passwordHash,
+	//	CreatedAt:    createdAt,
+	//	IsDeleted:    false,
+	//}
+
+	_, err := repo.GetUserByLogin(login)
+	assert.Error(t, err)
+	// then
+	//assert.NotNil(t, res)
+	//assert.NoError(t, err)
+	//assert.Equal(t, expected, res)
+}
+
+//func TestPostgresUserRepository_GetUserByLogin(t *testing.T) {
+//	type fields struct {
+//		client database.Client
 //	}
-//
-//	created := models.User{
-//		Id:           userUUID,
-//		Login:        login,
-//		PasswordHash: passwordHash,
-//		CreatedAt:    createdAt,
-//		IsDeleted:    false,
+//	type args struct {
+//		login string
 //	}
-//
-//	repo := mocks.NewMockUserRepository(ctrl)
-//	repo.
-//		EXPECT().
-//		CreateUser(gomock.Eq(user)).
-//		Return(created, nil)
-//
-//	res, err := repo.CreateUser(user)
-//
-//	// then
-//	assert.NotNil(t, res)
-//	assert.NoError(t, err)
-//	assert.Equal(t, created, res)
+//	tests := []struct {
+//		name    string
+//		fields  fields
+//		args    args
+//		want    models.User
+//		wantErr assert.ErrorAssertionFunc
+//	}{
+//		// TODO: Add test cases.
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			p := &PostgresUserRepository{
+//				client: tt.fields.client,
+//			}
+//			got, err := p.GetUserByLogin(tt.args.login)
+//			if !tt.wantErr(t, err, fmt.Sprintf("GetUserByLogin(%v)", tt.args.login)) {
+//				return
+//			}
+//			assert.Equalf(t, tt.want, got, "GetUserByLogin(%v)", tt.args.login)
+//		})
+//	}
 //}

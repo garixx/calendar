@@ -2,9 +2,10 @@ package jwt
 
 import (
 	"calendar/internals/vault"
-	"github.com/dgrijalva/jwt-go"
 	"log"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 var secretKey, _ = vault.GetKey("stub")
@@ -15,8 +16,8 @@ func GenerateToken(username string) (string, error) {
 	claims := token.Claims.(jwt.MapClaims)
 
 	claims["username"] = username
-	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-	tokenString, err := token.SignedString(secretKey)
+	claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
+	tokenString, err := token.SignedString([]byte(secretKey))
 	if err != nil {
 		log.Fatal("Error in generating key")
 		return "", err
