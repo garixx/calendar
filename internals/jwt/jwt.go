@@ -1,14 +1,14 @@
 package jwt
 
 import (
-	"calendar/internals/vault"
+	"calendar/internals/ssm"
 	"log"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-var secretKey, _ = vault.GetKey("stub")
+var secretKey, _ = ssm.GetSecret("stub")
 
 func GenerateToken(username string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
@@ -27,7 +27,7 @@ func GenerateToken(username string) (string, error) {
 
 func ParseToken(tokenStr string) (string, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		return secretKey, nil
+		return []byte(secretKey), nil
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {

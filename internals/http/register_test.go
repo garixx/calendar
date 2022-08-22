@@ -19,7 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRegisterHandler(t *testing.T) {
+func TestRegisterHandler_success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -69,36 +69,24 @@ func TestRegisterHandler(t *testing.T) {
 	assert.Equal(t, created.Id, response.Id)
 }
 
-func TestRegisterHandler2(t *testing.T) {
+func TestRegisterHandler_login_to_long(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	// given
 	login := "tooLongLoginText"
 	password := "pass"
-	//hash := "passHash"
-	//createdAt := time.Now()
 
 	payload := models.UserRequest{
 		Login:    login,
 		Password: password,
 	}
 
-	//created := models.User{
-	//	Id:           uuid.NewString(),
-	//	Login:        login,
-	//	PasswordHash: hash,
-	//	CreatedAt:    createdAt,
-	//	IsDeleted:    false,
-	//}
-
 	ucase := mocks.NewMockUserUsecase(ctrl)
 	ucases := aggregate.Calendar{
 		UserCase: ucase,
 	}
 	handler := registerHandler(&ucases)
-
-	//ucase.EXPECT().CreateUser(gomock.Eq(payload)).Return(created, nil)
 
 	p, err := json.Marshal(payload)
 	require.NoError(t, err, "payload should be parsed to JSON")
@@ -114,44 +102,17 @@ func TestRegisterHandler2(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	//assert.NoError(t, validate.Struct(response))
-	//assert.Equal(t, payload.Login, response.Login)
-	//assert.Equal(t, created.Id, response.Id)
 }
 
-func TestRegisterHandler3(t *testing.T) {
+func TestRegisterHandler_broken_payload(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-
-	// given
-	//login := "tooLongLoginText"
-	//password := "pass"
-	//hash := "passHash"
-	//createdAt := time.Now()
-
-	//payload := models.UserRequest{
-	//	Login:    login,
-	//	Password: password,
-	//}
-
-	//created := models.User{
-	//	Id:           uuid.NewString(),
-	//	Login:        login,
-	//	PasswordHash: hash,
-	//	CreatedAt:    createdAt,
-	//	IsDeleted:    false,
-	//}
 
 	ucase := mocks.NewMockUserUsecase(ctrl)
 	ucases := aggregate.Calendar{
 		UserCase: ucase,
 	}
 	handler := registerHandler(&ucases)
-
-	//ucase.EXPECT().CreateUser(gomock.Eq(payload)).Return(created, nil)
-
-	//p, err := json.Marshal(payload)
-	//require.NoError(t, err, "payload should be parsed to JSON")
 
 	req := httptest.NewRequest("POST", "http://localhost/register", bytes.NewBuffer([]byte(`{"field": "1"`)))
 	w := httptest.NewRecorder()
@@ -164,9 +125,6 @@ func TestRegisterHandler3(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	//assert.NoError(t, validate.Struct(response))
-	//assert.Equal(t, payload.Login, response.Login)
-	//assert.Equal(t, created.Id, response.Id)
 }
 
 func TestRegisterHandler4(t *testing.T) {
@@ -176,21 +134,11 @@ func TestRegisterHandler4(t *testing.T) {
 	// given
 	login := "myLogin"
 	password := "pass"
-	//hash := "passHash"
-	//createdAt := time.Now()
 
 	payload := models.UserRequest{
 		Login:    login,
 		Password: password,
 	}
-
-	//created := models.User{
-	//	Id:           uuid.NewString(),
-	//	Login:        login,
-	//	PasswordHash: hash,
-	//	CreatedAt:    createdAt,
-	//	IsDeleted:    false,
-	//}
 
 	ucase := mocks.NewMockUserUsecase(ctrl)
 	ucases := aggregate.Calendar{
@@ -214,7 +162,4 @@ func TestRegisterHandler4(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
-	//assert.NoError(t, validate.Struct(response))
-	//assert.Equal(t, payload.Login, response.Login)
-	//assert.Equal(t, created.Id, response.Id)
 }

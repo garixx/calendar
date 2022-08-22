@@ -1,35 +1,29 @@
 package hashing
 
 import (
-	"fmt"
-	"github.com/jameskeane/bcrypt"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-var password = "WyWihatdyd?frub1"
-var bad_password = "just a wild guess"
+func TestBcryptingIsEasy(t *testing.T) {
+	pass := "mypassword"
+	hp, err := HashPassword(pass)
+	require.NoError(t, err, "HashPassword failed")
 
-func TestHashing(t *testing.T) {
-	// generate a random salt with default rounds of complexity
-	salt, _ := bcrypt.Salt()
+	isValid := CheckPasswordHash(pass, hp)
+	assert.True(t, isValid)
 
-	// generate a random salt with 10 rounds of complexity
-	salt, _ = bcrypt.Salt(10)
+	notPass := "notthepass"
+	errorGot := CheckPasswordHash(hp, notPass)
+	assert.False(t, errorGot)
+}
 
-	// hash and verify a password with random salt
-	hash, _ := bcrypt.Hash(password)
-	if bcrypt.Match(password, hash) {
-		fmt.Println("They match")
-	}
+func TestBcryptingIsEasy2(t *testing.T) {
+	pass := "password"
+	hp := "$2a$14$1MEzFbcJXlcBQ8/26tTwK.yF7A2k3TcjWhetZ3CZlvNxUz5LX/NwG"
 
-	// hash and verify a password with a static salt
-	hash, _ = bcrypt.Hash(password, salt)
-	if bcrypt.Match(password, hash) {
-		fmt.Println("They match")
-	}
-
-	// verify a random password fails to match the hashed password
-	if !bcrypt.Match(bad_password, hash) {
-		fmt.Println("They don't match")
-	}
+	res := CheckPasswordHash(pass, hp)
+	assert.True(t, res)
 }

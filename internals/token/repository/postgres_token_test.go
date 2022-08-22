@@ -4,6 +4,7 @@ import (
 	"calendar/internals/jwt"
 	"calendar/internals/models"
 	"calendar/internals/validate"
+	"github.com/thanhpk/randstr"
 	"testing"
 
 	"github.com/jackc/pgx/v4"
@@ -42,149 +43,71 @@ func TestPostgresTokenRepository_CreateToken(t *testing.T) {
 }
 
 func TestPostgresTokenRepository_GetToken(t *testing.T) {
-	t.Parallel()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	// given
-	jwtToken, err := jwt.GenerateToken("me")
+	jwtToken, err := jwt.GenerateToken(randstr.String(5))
 	require.NoError(t, err, "jwt token should be generated")
 
-	token := models.Token{
-		Token: jwtToken,
+	type args struct {
+		rows      pgx.Rows
+		rowsError error
+		token     models.Token
 	}
 
-	mockPool := pgxpoolmock.NewMockPgxIface(ctrl)
-	pgxRows := pgxpoolmock.NewRows([]string{"token"}).AddRow(jwtToken).ToPgxRows()
-	mockPool.EXPECT().Query(gomock.Any(), gomock.Any(), gomock.Eq(jwtToken)).Return(pgxRows, nil)
-
-	repo := NewPostgresUserRepository(mockPool)
-	res, err := repo.GetToken(token)
-
-	// then
-	assert.NoError(t, err)
-	assert.NoError(t, validate.Struct(res))
-	assert.Equal(t, token, res)
-}
-
-func TestPostgresTokenRepository_GetToken2(t *testing.T) {
-	t.Parallel()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	// given
-	jwtToken, err := jwt.GenerateToken("me")
-	require.NoError(t, err, "jwt token should be generated")
-
-	token := models.Token{
-		Token: jwtToken,
+	tests := []struct {
+		name    string
+		args    args
+		want    models.Token
+		wantErr bool
+	}{
+		{
+			name: "positive case",
+			args: args{
+				rows:      pgxpoolmock.NewRows([]string{"token"}).AddRow(jwtToken).ToPgxRows(),
+				rowsError: nil,
+				token:     models.Token{Token: jwtToken},
+			},
+			want:    models.Token{Token: jwtToken},
+			wantErr: false,
+		},
+		{
+			name: "db request error",
+			args: args{
+				rows:      nil,
+				rowsError: pgx.ErrNoRows,
+				token:     models.Token{Token: jwtToken},
+			},
+			want:    models.Token{},
+			wantErr: true,
+		},
+		{
+			name: "not exist in DB",
+			args: args{
+				rows:      pgxpoolmock.NewRows([]string{"token"}).ToPgxRows(),
+				rowsError: nil,
+				token:     models.Token{Token: jwtToken},
+			},
+			want:    models.Token{},
+			wantErr: true,
+		},
 	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-	mockPool := pgxpoolmock.NewMockPgxIface(ctrl)
-	mockPool.EXPECT().Query(gomock.Any(), gomock.Any(), gomock.Eq(jwtToken)).Return(nil, pgx.ErrNoRows)
+			mockPool := pgxpoolmock.NewMockPgxIface(ctrl)
+			mockPool.EXPECT().Query(gomock.Any(), gomock.Any(), gomock.Eq(jwtToken)).Return(tt.args.rows, tt.args.rowsError)
 
-	repo := NewPostgresUserRepository(mockPool)
-	_, err = repo.GetToken(token)
+			repo := NewPostgresUserRepository(mockPool)
+			res, err := repo.GetToken(tt.args.token)
 
-	// then
-	assert.Error(t, err)
-	//assert.NoError(t, validate.Struct(res))
-	//assert.Equal(t, token, res)
-}
-
-func TestPostgresTokenRepository_GetToken3(t *testing.T) {
-	t.Parallel()
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	// given
-	jwtToken, err := jwt.GenerateToken("me")
-	require.NoError(t, err, "jwt token should be generated")
-
-	token := models.Token{
-		Token: jwtToken,
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.NoError(t, validate.Struct(res))
+				assert.Equal(t, tt.args.token, res)
+			}
+		})
 	}
-
-	mockPool := pgxpoolmock.NewMockPgxIface(ctrl)
-	pgxRows := pgxpoolmock.NewRows([]string{"token"}).ToPgxRows()
-	mockPool.EXPECT().Query(gomock.Any(), gomock.Any(), gomock.Eq(jwtToken)).Return(pgxRows, nil)
-
-	repo := NewPostgresUserRepository(mockPool)
-	_, err = repo.GetToken(token)
-
-	// then
-	assert.Error(t, err)
-	//assert.NoError(t, validate.Struct(res))
-	//assert.Equal(t, token, res)
 }
-
-//func Test(t *testing.T) {
-//	tests := []struct {
-//		name string
-//		rows pgx.Rows
-//	}{
-//		{
-//			name: "xxx",
-//			rows:
-//		},
-//		// TODO: test cases
-//	}
-//	for _, test := range tests {
-//		t.Run(test.name, func(t *testing.T) {
-//			t.Parallel()
-//			ctrl := gomock.NewController(t)
-//			defer ctrl.Finish()
-//
-//			// given
-//			jwtToken, err := jwt.GenerateToken("me")
-//			require.NoError(t, err, "jwt token should be generated")
-//
-//			token := models.Token{
-//				Token: jwtToken,
-//			}
-//
-//			mockPool := pgxpoolmock.NewMockPgxIface(ctrl)
-//			expected := pgxpoolmock.NewRow(jwtToken)
-//			mockPool.EXPECT().QueryRow(gomock.Any(), gomock.Any(), gomock.Eq(jwtToken)).Return(expected)
-//
-//			repo := NewPostgresUserRepository(mockPool)
-//
-//			res, err := repo.CreateToken(token)
-//
-//			// then
-//			assert.NoError(t, err)
-//			assert.NoError(t, validate.Struct(res))
-//			assert.Equal(t, token, res)
-//		})
-//	}
-//}
-//
-//func TestPostgresTokenRepository_GetToken1(t *testing.T) {
-//	type fields struct {
-//		client database.Client
-//	}
-//	type args struct {
-//		token models.Token
-//	}
-//	tests := []struct {
-//		name    string
-//		fields  fields
-//		args    args
-//		want    models.Token
-//		wantErr assert.ErrorAssertionFunc
-//	}{
-//		// TODO: Add test cases.
-//	}
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			p := &PostgresTokenRepository{
-//				client: tt.fields.client,
-//			}
-//			got, err := p.GetToken(tt.args.token)
-//			if !tt.wantErr(t, err, fmt.Sprintf("GetToken(%v)", tt.args.token)) {
-//				return
-//			}
-//			assert.Equalf(t, tt.want, got, "GetToken(%v)", tt.args.token)
-//		})
-//	}
-//}

@@ -6,10 +6,10 @@ import "github.com/go-playground/validator/v10"
 var validate *validator.Validate
 
 func Struct(s interface{}) error {
-	return getValidator().Struct(s)
+	return GetValidator().Struct(s)
 }
 
-func getValidator() *validator.Validate {
+func GetValidator() *validator.Validate {
 	if validate == nil {
 		validate = validator.New()
 		// registering alias so we can see the differences between
