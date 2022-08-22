@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"os"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 type PostgresConfig struct {
@@ -32,11 +33,7 @@ func GetPostgresConfig(path string) (PostgresConfig, error) {
 }
 
 func initConfig(path string) error {
-	//// make qa environment default
-	//_ = viper.BindEnv("environment")
-	//viper.SetDefault("environment", "QA")
-
-	path = fmt.Sprintf(path, strings.ToLower(os.Getenv("environment")))
+	path = fmt.Sprintf(path, strings.ToLower(os.Getenv("ENVIRONMENT")))
 	viper.SetConfigFile(path)
 	return viper.ReadInConfig()
 }

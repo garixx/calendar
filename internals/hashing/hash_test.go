@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestBcryptingIsEasy(t *testing.T) {
+func TestHashPassword(t *testing.T) {
 	pass := "mypassword"
 	hp, err := HashPassword(pass)
 	require.NoError(t, err, "HashPassword failed")
@@ -20,7 +20,7 @@ func TestBcryptingIsEasy(t *testing.T) {
 	assert.False(t, errorGot)
 }
 
-func TestBcryptingIsEasy2(t *testing.T) {
+func TestCheckPasswordHash(t *testing.T) {
 	pass := "password"
 	hp := "$2a$14$1MEzFbcJXlcBQ8/26tTwK.yF7A2k3TcjWhetZ3CZlvNxUz5LX/NwG"
 

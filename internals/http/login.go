@@ -43,7 +43,6 @@ func loginHandler(calendar *aggregate.Calendar) func(w http.ResponseWriter, r *h
 			return
 		}
 
-		// Left for training purpose only.
 		response, err := calendar.TokenCase.CreateToken(models.Token{Token: token})
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

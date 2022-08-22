@@ -5,21 +5,17 @@ import (
 	"calendar/internals/jwt"
 	"calendar/internals/mocks"
 	"calendar/internals/models"
-	"github.com/thanhpk/randstr"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/jackc/pgx/v4"
-
-	"github.com/stretchr/testify/require"
-
 	"github.com/golang/mock/gomock"
-
-	"github.com/stretchr/testify/assert"
-
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx/v4"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"github.com/thanhpk/randstr"
 )
 
 func TestMiddlewareExecution_valid_token(t *testing.T) {
